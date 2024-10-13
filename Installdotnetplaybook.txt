@@ -1,0 +1,46 @@
+- name : Create a plybook to deploy an ASP.NET web API
+  hosts : all
+  become : true
+
+  tasks:
+
+    - name : Install wget
+      ansible.builtin.apt:
+        name: wget
+        state: present
+
+    - name : Install transport HTTPS
+      ansible.builtin.apt:
+        name: apt-transport-https
+        state: present
+
+
+
+    - name : Download microsoft package file
+      ansible.builtin.get_url:
+        url: https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb
+        dest: .
+
+
+
+    - name : Install package file
+      command : sudo dpkg -i packages-microsoft-prod.deb
+
+
+
+    - name : Run apt update
+      apt:
+       update_cache: yes
+
+    - name: Install .NET SDK
+      apt:
+        name: dotnet-sdk-7.0  # Adjust as needed
+        state: present
+
+    - name : Check if dotnet is installed
+      command: dotnet --version
+      register: dotnet_version
+
+    - name: Print .NET version
+      debug:
+        msg: "Installed .NET version is {{ dotnet_version.stdout }}"
